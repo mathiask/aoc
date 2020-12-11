@@ -1,4 +1,4 @@
-(defun day11-compute-next-cells (n)
+(defun day11-compute-next-cells (n nbhdfn th)
   (with-current-buffer "input"
     (goto-char 2) ; pos 1 contains " " as must the entire column 0
     (let ((chg nil))
@@ -8,7 +8,7 @@
            (set-text-properties
             (point) (1+ (point))
             (list 'cell
-                  (if (> (day11-neighbors n) 0)
+                  (if (> (day11-neighbors n nbhdfn) 0)
                       ?L
                     (setq chg t)
                     ?#)
@@ -16,9 +16,9 @@
           (?#
            (set-text-properties
             (point) (1+ (point))
-            (let ((n (day11-neighbors n)))
+            (let ((n (day11-neighbors n nbhdfn)))
               (list 'cell
-                    (if (< n 4)
+                    (if (< n th)
                         ?#
                       (setq chg t)
                       ?L)
@@ -26,16 +26,16 @@
         (forward-char))
       chg)))
 
-(defun day11-neighbors (n)
+(defun day11-neighbors (n nbhdfn)
   (+
-   (day11-neighbor -1 -1 n)
-   (day11-neighbor  0 -1 n)
-   (day11-neighbor  1 -1 n)
-   (day11-neighbor -1  0 n)
-   (day11-neighbor  1  0 n)
-   (day11-neighbor -1  1 n)
-   (day11-neighbor  0  1 n)
-   (day11-neighbor  1  1 n)))
+   (funcall nbhdfn -1 -1 n)
+   (funcall nbhdfn  0 -1 n)
+   (funcall nbhdfn  1 -1 n)
+   (funcall nbhdfn -1  0 n)
+   (funcall nbhdfn  1  0 n)
+   (funcall nbhdfn -1  1 n)
+   (funcall nbhdfn  0  1 n)
+   (funcall nbhdfn  1  1 n)))
 
 (defun day11-neighbor (dx dy n)
   (if (eq ?# (char-after (+ (point) dx (* dy n)))) 1 0))
@@ -55,17 +55,35 @@
 
 (day11-update)
 
-(defun day11 (n)
+(defun day11 (n &optional nbhdfn th)
   (buffer-disable-undo "input")
-  (while (day11-compute-next-cells n)
+  (while (day11-compute-next-cells n
+                                   (or nbhdfn #'day11-neighbor)
+                                   (or th 4))
     (day11-update))
   (with-current-buffer "input"
     (length (seq-filter (lambda (c) (eq ?# c)) (buffer-string)))))
 
-(day11 96)
+(defun day11a-neighbor (dx dy n)
+  (let ((tx dx)
+        (ty dy))
+    (while (eq ?. (char-after (+ (point) tx (* ty n))))
+      (setq tx (+ tx dx))
+      (setq ty (+ ty dy)))
+    (if (eq ?# (char-after (+ (point) tx (* ty n)))) 1 0)))
+
+(day11 12)
+37
 2249
 
-37
+(day11-compute-next-cells 12 #'day11a-neighbor 5)
+(day11-update)
+
+(day11 96 #'day11a-neighbor 5)
+2023
+
+26
+
 
 
 ;; ------------------------------------------------------------
