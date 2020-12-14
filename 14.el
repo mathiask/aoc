@@ -9,7 +9,7 @@ most-positive-fixnum
   (forward-line)
   (let* ((max36 (1- (lsh 1 36)))
          (masks (cons 0 max36))
-         (mem (make-vector 70000 0)))
+         (mem (make-hash-table :size 70000)))
     (while (not (or (eobp) (looking-at "^;;;;;")))
       (re-search-forward "^\\(mask\\|mem\\[\\([0-9]+\\)]\\) ?= +\\(.*\\)$")
       (let ((l (length (match-string 0)))
@@ -28,17 +28,21 @@ most-positive-fixnum
                            (seq-map (lambda (c) (if (= c ?0) ?0 ?1)) arg))
                     2)))
           ;; cmd = "mem[N]"
-          (aset mem (string-to-number ix)
-                (logior (car masks)
+          (puthash
+           (string-to-number ix)
+           (logior (car masks)
                         (logand (cdr masks)
-                                (string-to-number arg))))))
+                                (string-to-number arg)))
+           mem)))
       (forward-line))
-    (seq-reduce #'+ mem 0)))
+    (let ((s 0))
+      (maphash (lambda (k v) (setq s (+ s v))) mem)
+      s)))
 
 (day14)
 
 
-;;;;; test INPUT
+;;;;; INPUT
 mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X
 mem[8] = 11
 mem[7] = 101
