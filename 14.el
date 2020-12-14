@@ -12,8 +12,7 @@ most-positive-fixnum
          (mem (make-hash-table :size 70000)))
     (while (not (or (eobp) (looking-at "^;;;;;")))
       (re-search-forward "^\\(mask\\|mem\\[\\([0-9]+\\)]\\) ?= +\\(.*\\)$")
-      (let ((l (length (match-string 0)))
-            (cmd (match-string 1))
+      (let ((cmd (match-string 1))
             (ix (match-string 2))
             (arg (match-string 3)))
         (if (string= cmd "mask")
@@ -41,12 +40,80 @@ most-positive-fixnum
 
 (day14)
 
+; find the LSB
+(dotimes (i 50) (message "%d -> %d" i (logxor i (logand i (1- i)))))
 
-;;;;; INPUT
+(defun day14a-masks (s)
+  (list
+   (string-to-number ;; OR mask
+    (apply #'string
+           (seq-map (lambda (c) (if (= c ?1) ?1 ?0)) s))
+    2)
+   (string-to-number ;; AND mask
+    (apply #'string
+           (seq-map (lambda (c) (if (= c ?0) ?1 ?0)) s))
+    2)
+   (let ((x (string-to-number
+             (apply #'string ;; AND mask
+                    (seq-map (lambda (c) (if (= c ?X) ?1 ?0)) s))
+             2))
+         (r '(0)))
+     (while (> x 0)
+       (let ((lsb (logxor x (logand x (1- x)))))
+         (setq r (append r
+                         (mapcar (lambda (z) (+ lsb z)) r))
+               x (logxor x lsb))))
+     r)))
+
+(day14a-masks "000000000000000000000000000000X1001X")
+(18 68719476684 (0 1 32 33))
+(day14a-masks "00000000000000000000000000000000X0XX")
+(0 68719476724 (0 1 2 3 8 9 10 11))
+
+(defun day14a ()
+  (goto-char 1)
+  (re-search-forward "^;;;;; INPUT$")
+  (forward-line)
+  (let* ((masks (cons 0 '(0)))
+         (mem (make-hash-table :size 70000)))
+    (while (not (or (eobp) (looking-at "^;;;;;")))
+      (re-search-forward "^\\(mask\\|mem\\[\\([0-9]+\\)]\\) ?= +\\(.*\\)$")
+      (let ((cmd (match-string 1))
+            (adr (match-string 2))
+            (arg (match-string 3)))
+        (if (string= cmd "mask")
+            (setq masks (day14a-masks arg))
+          ;; cmd = "mem[N]"
+          (mapc (lambda (x)
+                  (puthash
+                   (logior x
+                           (car masks)
+                           (logand (cadr masks)
+                                   (string-to-number adr)))
+                   (string-to-number arg)
+                   mem))
+                (caddr masks))))
+      (forward-line))
+    ;;(message "%s" mem)
+    (let ((s 0))
+      (maphash (lambda (k v) (setq s (+ s v))) mem)
+      s)))
+
+(day14a)
+
+
+;;;;; Test INPUT
 mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X
 mem[8] = 11
 mem[7] = 101
 mem[8] = 0
+;;;;; END
+
+;;;;; Test INPUT
+mask = 000000000000000000000000000000X1001X
+mem[42] = 100
+mask = 00000000000000000000000000000000X0XX
+mem[26] = 1
 ;;;;; END
 
 ;;;;; INPUT
@@ -615,4 +682,5 @@ mem[17938] = 33020705
 mem[2666] = 88651117
 mem[21482] = 161753
 ;;;;; END
+5030603328768
 4297467072083
