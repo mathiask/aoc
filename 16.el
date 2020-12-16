@@ -1,43 +1,149 @@
+(defun day16-fields-at-point ()
+  (split-string (buffer-substring
+                 (line-beginning-position)
+                 (line-end-position))
+                ","))
+
 (defun day16 ()
-  (goto-char 1)
-  (re-search-forward "^;;;;; INPUT$")
-  (forward-line)
-  (let (rules)
-    (while (not (looking-at "^$"))
-      (re-search-forward
-       "^[ a-z]+: \\([0-9]+\\)-\\([0-9]+\\) or \\([0-9]+\\)-\\([0-9]+\\)$"
-       (line-end-position))
-      (setq rules
-            (cons
+  (save-excursion
+   (goto-char 1)
+   (re-search-forward "^;;;;; INPUT$")
+   (forward-line)
+   (let (rules)
+
+     ;; read all rules
+     (while (not (looking-at "^$"))
+       (re-search-forward
+        "^\\([ a-z]+\\): \\([0-9]+\\)-\\([0-9]+\\) or \\([0-9]+\\)-\\([0-9]+\\)$"
+        (line-end-position))
+       (setq rules
              (cons
-              (cons (string-to-number (match-string 1))
-                    (string-to-number (match-string 2)))
-              (cons (string-to-number (match-string 3))
-                    (string-to-number (match-string 4))))
-             rules))
-      (forward-line))
-    (search-forward "nearby tickets:")
-    (forward-line)
-    (let (err)
-      (while (not (or (eobp) (looking-at "^;;;;;")))
-        (let ((xs (mapcar #'string-to-number
-                         (split-string (buffer-substring
-                                        (line-beginning-position)
-                                        (line-end-position))
-                                       ","))))
-          (dolist (x xs)
-            (unless (seq-some (lambda (r) (or (and (<= (caar r) x) (<= x (cdar r)))
-                                         (and (<= (cadr r) x) (<= x (cddr r)))))
-                              rules)
-              (setq err (cons x err)))))
-        (forward-line))
-      (seq-reduce #'+ err 0))))
+              (list
+               (cons (string-to-number (match-string 2))
+                     (string-to-number (match-string 3)))
+               (cons (string-to-number (match-string 4))
+                     (string-to-number (match-string 5)))
+               (substring-no-properties (match-string 1)))
+              rules))
+       (forward-line))
+
+     ;; process tickets
+     (search-forward "nearby tickets:")
+     (forward-line)
+     (let* ((err nil)
+            (n (length (day16-fields-at-point)))
+            (l (number-sequence 0 (1- n)))
+            (candidates (mapcar (lambda (r) (let ((h (make-hash-table)))
+                                         (dotimes (i n) (puthash i 't h))
+                                         h))
+                                rules)))
+       (while (not (or (eobp) (looking-at "^;;;;;")))
+         (let ((xs (mapcar #'string-to-number (day16-fields-at-point))))
+           (seq-do-indexed
+            (lambda (x i)
+              (let (ok
+                    broken-rules)
+                (seq-do-indexed
+                 (lambda (r j)
+                   (if (or (and (<= (caar r) x) (<= x (cdar r)))
+                           (and (<= (caadr r) x) (<= x (cdadr r))))
+                       (setq ok 't)
+                     (setq broken-rules (cons j broken-rules))))
+                 rules)
+                (if ok
+                    (dolist (j broken-rules)
+                      (puthash i nil (elt candidates j)))
+                  (setq err (cons x err)))))
+            xs))
+         (forward-line))
+
+       ;; do inference on rules
+       (let ((go 't)
+             (rprocessed (make-hash-table))
+             (rs (seq-map-indexed (lambda (r i)
+                                    (cons (caddr r)
+                                          (let ((h (elt candidates i)))
+                                            (seq-filter
+                                             (lambda (k) (gethash k h))
+                                             (hash-table-keys h)))))
+                                  rules)))
+         (while go
+           (setq go nil)
+           (let ((r (car (seq-filter
+                          (lambda (r)
+                            (and
+                             (not (gethash (intern (car r)) rprocessed))
+                             (< (length r) 3)))
+                          rs))))
+             (when r
+               (setq go 't)
+               (puthash (intern (car r)) 't rprocessed)
+               (mapc (lambda (r2) (delq (cadr r) (cdr r2))) rs))))
+
+         ;; result
+         (list (seq-reduce #'+ err 0) rs))))))
 
 (day16)
+(0 (("seat" 2) ("row" 0) ("class" 1)))
+(0 (("seat" 2) ("row" 0 1 2) ("class" 1 2)))
+(71 (("seat" 2) ("row" 0) ("class" 1)))
+71
+23925
+
+(seq-filter
+ (lambda (r) (string-match "^" (car r)))
+ (cadr (day16)))
+nil
+
+
+(("departure time" 0 8 11 12 13 14 16 17) ("departure date" 0 2 5 8 11 12 13 14 15 16 17 ...) ("departure track" 0 1 2 5 8 11 12 13 14 15 16 ...) ("departure platform" 0 2 5 8 11 12 13 14 15 16 17) ("departure station" 0 2 5 8 11 12 13 14 16 17) ("departure location" 0 5 8 11 12 13 14 16 17))
+
+(23925 (("zone" 0 1 2 4 5 8 11 12 13 14 15 16 17 19) ("wagon" 6 8 13 14) ("type" 6 8 13 14 16 17) ("train" 0 1 2 3 4 5 7 8 9 10 11 12 13 14 15 16 17 19) ("seat" 18) ("row" 0 8 12 13 14 16 17) ("route" 0 1 2 3 4 5 8 9 11 12 13 14 15 16 17 19) ("price" 0 1 2 3 4 5 8 9 10 11 12 13 14 15 16 17 19) ("duration" 0 8 13 14 16 17) ("class" 6) ("arrival track" 6 8 13) ("arrival platform" 0 1 2 3 4 5 8 11 12 13 14 15 16 17 19) ("arrival station" 6 8 13 14 17) ("arrival location" 6 13) ("departure time" 0 8 11 12 13 14 16 17) ("departure date" 0 2 5 8 11 12 13 14 15 16 17 19) ("departure track" 0 1 2 5 8 11 12 13 14 15 16 17 19) ("departure platform" 0 2 5 8 11 12 13 14 15 16 17) ("departure station" 0 2 5 8 11 12 13 14 16 17) ("departure location" 0 5 8 11 12 13 14 16 17)))
+
+;; Let's do some manual reasoning...
+;;    0: duration
+;; *  1: departure track
+;; *  2: departure station
+;;    3: "arrival platform"
+;;    4: zone
+;; *  5: departure location
+;;    6: class
+;;    7: train
+;;    8: arrival track
+;;    9: route
+;;   10: price
+;; * 11: departure time
+;;   12: row
+;;   13: arrival location
+;;   14: wagon
+;; * 15: departure platform
+;;   16: type
+;;   17: arrival station
+;;   18: seat
+;; * 19: departure date
+
+;;; your ticket:
+;;; 191,89,73,139,71,103,109,53,97,179,59,67,79,101,113,157,61,107,181,137
+
+(* 89 73 103 67 157 137)
+964373157673
 
 
 
-;;;;; Test-INPUT
+;;;;; INPUT
+class: 0-1 or 4-19
+row: 0-5 or 8-19
+seat: 0-13 or 16-19
+
+your ticket:
+11,12,13
+
+nearby tickets:
+3,9,18
+15,1,5
+5,14,9;;;;; END
+
+;;;;; Old Test INPUT
 class: 1-3 or 5-7
 row: 6-11 or 33-44
 seat: 13-40 or 45-50
@@ -317,4 +423,3 @@ nearby tickets:
 490,257,630,197,262,184,482,747,226,875,765,298,909,701,224,403,448,362,543,63
 542,911,290,696,865,74,529,655,946,183,518,577,679,347,70,795,512,745,711,118
 ;;;;; END
-23925
