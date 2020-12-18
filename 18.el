@@ -5,41 +5,57 @@
 ;; S2 ::= + T S2 | * T S2 | \epsilon
 ;; T  ::= 0 | ... | 9 | (S)
 
+;; -------------------- Part Two --------------------
+
+;; S ::= F | S * F
+;; F ::= T | F + T
+;; T ::= 0 | ... | 9 | (S)
+;; ------------------------
+;; S  ::= F S2
+;; S2 ::= * F S2 | \epsilon
+;; F  ::= T F2
+;; F2 ::= + T F2 | \epsilon
+;; T ::= 0 | ... | 9 | (S)
+
 
 (defun day18-S ()
-  (day18-S2 (day18-T)))
+  (day18-S2 (day18-F)))
 
-(defun day18-next-char ()
+(defun day18-next-char (&optional no-forward)
   (while (= ?\  (char-after))
     (forward-char))
   (let ((c (char-after)))
-    (unless (eolp) (forward-char))
+    (unless (or no-forward (eolp))
+      (forward-char))
     c))
 
 (defun day18-S2 (x)
-  (let ((c (day18-next-char)))
-   (case c
-     ((?+ ?*)
-      (let ((y (day18-T)))
-        (day18-S2
-         (if (= c ?+)
-             (+ x y)
-           (* x y)))))
-     (t
-      (when (= c ?\)) (forward-char -1))
-      x))))
+  (if (= (day18-next-char 't) ?*)
+      (progn
+        (forward-char 1)
+        (day18-S2 (* x (day18-F))))
+    x))
+
+(defun day18-F ()
+  (day18-F2 (day18-T)))
+
+(defun day18-F2 (x)
+  (if (= (day18-next-char 't) ?+)
+      (progn
+        (forward-char 1)
+        (day18-F2 (+ x (day18-T))))
+    x))
 
 (defun day18-T ()
   (let ((c (day18-next-char)))
     (if (= c ?\()
         (let ((x (day18-S)))
           (unless (= (day18-next-char) ?\))
-            (error "Expected '(' but got %c at %d (c=%c)!"
+            (error "Expected '(' but got %c at %d!"
                    (day18-next-char)
                    (point)))
           x)
       (- c ?0))))
-
 
 (defun day18 ()
   (save-excursion
@@ -53,20 +69,18 @@
      s)))
 
 (day18)
-45283905029161
+216975281211165
 
+45283905029161
 26406
 
 ;;;;; Test INPUT
 1 + 2 * 3 + 4 * 5 + 6
+1 + (2 * 3) + (4 * (5 + 6))
 2 * 3 + (4 * 5)
 5 + (8 * 3 + 9 + 3 * 4 * 3)
 5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))
 ((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2
-;;;;; END
-
-;;;;; INPUT
-
 ;;;;; END
 
 ;;;;; INPUT
