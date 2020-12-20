@@ -17,7 +17,7 @@
 (defun day20-normalize (x)
   (min x (day20-flip x)))
 
-(defun day20-edges ()
+(defun day20-edges (&optional no-normalize)
   (let ((top (day20-from-binary-string
               (buffer-substring (line-beginning-position)
                                 (line-end-position))))
@@ -35,26 +35,27 @@
                (buffer-substring (line-beginning-position)
                                  (line-end-position)))))
       (forward-line))
-    (list (day20-normalize top)
-          (day20-normalize right)
-          (day20-normalize bottom)
-          (day20-normalize left))))
+    (list (if no-normalize top (day20-normalize top))
+          (if no-normalize right (day20-normalize right))
+          (if no-normalize bottom (day20-normalize bottom))
+          (if no-normalize left (day20-normalize left)))))
 
 (defun day20 ()
   (save-excursion
    (goto-char 1)
    (re-search-forward "^;;;;; INPUT$")
    (forward-line)
-   (let (image-edges)
+   (let ((image-hash (make-hash-table))
+         image-edges)
      (while (not (or (eobp) (looking-at "^;;;;;")))
        (re-search-forward "[0-9]+")
-       (setq image-edges
-             (cons (list
-                    (string-to-number (match-string 0))
-                    (progn
-                      (forward-line)
-                      (day20-edges)))
-                   image-edges))
+       (let ((e (cons
+                 (string-to-number (match-string 0))
+                 (progn
+                   (forward-line)
+                   (day20-edges)))))
+         (setq image-edges (cons (list (car e) (cdr e)) image-edges))
+         (puthash (car e) (cdr e) image-hash))
        (when (not (or (eobp) (looking-at "^;;;;;")))
          (forward-line)))
      ;; count edge occurrences
@@ -62,28 +63,55 @@
        (dolist (es image-edges)
          (dolist (e (cadr es))
            (puthash e (1+ (gethash e h 0)) h)))
-       (seq-filter
-        (lambda (x) (= 2 (cadr x)))
-        (mapcar
-         (lambda (es)
-           (list
-            (car es)
-            (length
-             (seq-filter
-              (lambda (x) (= 1 x))
-              (mapcar (lambda (e) (gethash e h)) (cadr es))))))
-         image-edges))))))
+       (mapcar
+        (lambda (es)
+          (list
+           (car es)
+           (mapcar (lambda (e) (cons e (gethash e h))) (cadr es))))
+        image-edges)))))
 
 (day20)
-((2029 2) (1873 2) (1447 2) (3221 2))
+((3079 ((501 . 1) (66 . 1) (116 . 2) (89 . 2))) (2729 ((85 . 2) (9 . 2) (397 . 2) (271 . 1))) (2971 ((161 . 1) (565 . 2) (85 . 2) (78 . 1))) (2473 ((481 . 1) (116 . 2) (234 . 2) (399 . 2))) (1489 ((43 . 1) (18 . 2) (183 . 2) (565 . 2))) (1427 ((183 . 2) (234 . 2) (210 . 2) (9 . 2))) (1171 ((399 . 2) (18 . 2) (24 . 1) (391 . 1))) (1951 ((397 . 2) (318 . 2) (177 . 1) (587 . 1))) (2311 ((210 . 2) (89 . 2) (231 . 1) (318 . 2))))
+
+((3079 2) (2971 2) (1171 2) (1951 2))
+;; 3079 2473 1171
+;; 2311 1427 1489
+;; 1951 2729 2971
+
+(defun day20-d4-apply (l trans)
+  (let* ((n (- 4 (car trans)))
+         (l (append (last l n) (butlast l n))))
+    (when (cdr trans)
+      (let ((x (elt l 1)))
+        (setf (elt l 1) (elt l 3)
+              (elt l 3) x)))
+    l))
+
+(day20-d4-apply '((501 . 1) (66 . 1) (116 . 2) (89 . 2)) '(3 . t))
+
+(defun day20-n-to-trans (n)
+    (cons (% n 4) (> n 3)))
+
+(defun day20-find-trans (left top sides)
+  (let ((n 0)
+        (f (lambda (x y) (or (and (not x)
+                             (= 1 (cdr y)))
+                        (and x (= x (car y))))))
+        r)
+    (while (and (not r) (< n 8))
+      (let ((sr (day20-d4-apply sides (day20-n-to-trans n))))
+        (when (and (funcall f left (elt sr 3))
+                   (funcall f top (elt sr 0)))
+          (setq r (day20-n-to-trans n))))
+      (incf n))
+    r))
+
+
+;;;---------------
 (apply #'* (mapcar #'car '((2029 2) (1873 2) (1447 2) (3221 2))))
 17712468069479
 
-((3079 2) (2971 2) (1171 2) (1951 2))
-(apply #'* (mapcar #'car '((3079 2) (2971 2) (1171 2) (1951 2))))
-20899048083289
-
-;;;;; Test INPUT
+;;;;; INPUT
 Tile 2311:
 ..##.#..#.
 ##..#.....
@@ -192,6 +220,8 @@ Tile 3079:
 ..#.......
 ..#.###...
 ;;;;; END
+
+;; ----------------------------------------------------------------------
 
 ;;;;; INPUT
 Tile 1319:
@@ -1921,3 +1951,4 @@ Tile 2011:
 #....#.###
 .........#
 .#..######
+;;;;; END
