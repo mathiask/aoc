@@ -40,7 +40,7 @@
           (if no-normalize bottom (day20-normalize bottom))
           (if no-normalize left (day20-normalize left)))))
 
-(defun day20 ()
+(defun day20 (start n)
   (save-excursion
    (goto-char 1)
    (re-search-forward "^;;;;; INPUT$")
@@ -63,14 +63,60 @@
        (dolist (es image-edges)
          (dolist (e (cadr es))
            (puthash e (1+ (gethash e h 0)) h)))
-       (mapcar
-        (lambda (es)
-          (list
-           (car es)
-           (mapcar (lambda (e) (cons e (gethash e h))) (cadr es))))
-        image-edges)))))
+       (setq image-edges
+             (mapcar
+              (lambda (es)
+                (list
+                 (car es)
+                 (mapcar (lambda (e) (cons e (gethash e h))) (cadr es))))
+              image-edges))
+       (let* ((fst (seq-find (lambda (x) (= start (car x))) image-edges))
+              (tr (day20-find-trans nil nil (cadr fst)))
+              (row (list (cons start tr)))
+              (next  (car  (elt (day20-d4-apply (cadr fst) tr) 1)))
+              (pick (lambda (left top)
+                      (let ((cand image-edges)
+                            res)
+                        (while (not res)
+                          (let ((tr (day20-find-trans left top (cadar cand))))
+                            (if tr
+                                (setq res (cons (car cand) tr))
+                              (setq cand (cdr cand)))))
+                        (setq image-edges
+                              (seq-remove (lambda (x) (= (caar res) (car x))) image-edges))
+                        res)))
+              rows)
+         (setq image-edges
+               (seq-remove (lambda (x) (= start (car x))) image-edges))
+         ;; puzzle first row
+         (dotimes (i (1- n))
+           (let ((ne (funcall pick next nil)))
+             (setq row (cons (cons (caar ne) (cdr ne)) row)
+                   next (car (elt (day20-d4-apply (cadar ne) (cdr ne)) 1)))))
+         (setq rows (list (reverse row)))
+         (dotimes (i (1- n))
+           (let (next)
+             (dotimes (j n)
+               (let ((ne (funcall pick
+                                  next
+                                  (let ((etr (elt (elt rows i) j)))
+                                    (day20-d4-apply
+                                     )
+                                    ))))
+                 (setq row (cons (cons (caar ne) (cdr ne)) row)
+                       next (car (elt (day20-d4-apply (cadar ne) (cdr ne)) 1))))
+               )
+             )
 
-(day20)
+           )
+         )
+       ))))
+
+(day20 3079 3)
+((3079 1) (2473 0 . t) (1171 3 . t))
+
+
+
 ((3079 ((501 . 1) (66 . 1) (116 . 2) (89 . 2))) (2729 ((85 . 2) (9 . 2) (397 . 2) (271 . 1))) (2971 ((161 . 1) (565 . 2) (85 . 2) (78 . 1))) (2473 ((481 . 1) (116 . 2) (234 . 2) (399 . 2))) (1489 ((43 . 1) (18 . 2) (183 . 2) (565 . 2))) (1427 ((183 . 2) (234 . 2) (210 . 2) (9 . 2))) (1171 ((399 . 2) (18 . 2) (24 . 1) (391 . 1))) (1951 ((397 . 2) (318 . 2) (177 . 1) (587 . 1))) (2311 ((210 . 2) (89 . 2) (231 . 1) (318 . 2))))
 
 ((3079 2) (2971 2) (1171 2) (1951 2))
