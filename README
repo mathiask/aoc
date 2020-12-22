@@ -14,6 +14,7 @@ For the problems see https://adventofcode.com/2020
 
 (while (not (or (eobp) (looking-at "^;;;;;")))
 
+substring-no-properties
 number-sequence, dolist, dotimes, mapc, mapchar
 seq-filter, seq-map, seq-do-indexed, seq-map-indexed
 
