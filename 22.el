@@ -93,3 +93,44 @@
 
 (day22 p1 p2)
 32162
+
+;; 43 19 : 2 29 14
+;; 19 43 2 : 29 14
+;; 43 2 : 14 29 19
+;; 2 43 14 : 29 19
+;; 43 14 : 19 29 2
+;; 14 43 19 : 29 2
+;; 43 19 : 2 29 14
+
+
+(defun day22a (deck1 deck2)
+  (let* ((result (day22-rec-play deck1 deck2))
+         (deck (cdr result))
+         (n (length deck))
+         (s 0))
+    (seq-do-indexed
+     (lambda (x i) (setq s (+ s (* (- n i) x))))
+     deck)
+    s))
+
+(defun day22-rec-play (deck1 deck2)
+  (let (h)
+    (while (and deck1 deck2 (not (member (cons deck1 deck2) h)))
+      (setq h (cons h (cons deck1 deck2)))
+      (let ((c1 (car deck1))
+            (c2 (car deck2)))
+        (setq deck1 (cdr deck1)
+              deck2 (cdr deck2))
+        (let ((p1win (if (and
+                          (<= c1 (length deck1))
+                          (<= c2 (length deck1)))
+                         (car (day22-rec-play deck1 deck2))
+                       (> c1 c2))))
+          (if p1win
+              (setq deck1 (append deck1 (list c1 c2)))
+            (setq deck2 (append deck2 (list c2 c1))))))))
+  (if (and deck1 deck2)
+      (cons t deck1)
+    (cons (not (not deck1)) (or deck1 deck2))))
+
+(day22a p1t p2t)
