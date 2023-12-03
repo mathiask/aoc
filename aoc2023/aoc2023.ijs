@@ -25,11 +25,10 @@ zoneight234
 )
 
 NB. I don't see an easy way to do this without a loop or rxrplc
-load 'regex'
-repl1 =: 3 : 0 
+repl1 =: 3 : 0
   for_ijk. 'one';'two';'three';'four';'five';'six';'seven';'eight';'nine' do.
     ijk =. >ijk
-    y =. (ijk; ijk,((": >: ijk_index), ijk)) rxrplc y
+    y =. y rplc ijk; ijk,((": >: ijk_index), ijk)
   end.
   y
 )
@@ -39,3 +38,6 @@ f1b =: [: +/ 10 1 * [: ".&> [: ({.,{:) [: (#~ e.&'0123456789') repl1
 NB. => 54078
 
 NB. ----------------------------------------------------------------------
+
+NB. 2.1
+NB. ---
