@@ -10,7 +10,7 @@ treb7uchet
 )
 
 f1 =: [: +/ 10 1 * [: ".&> [: ({.,{:) (#~ e.&'0123456789')
-+/ > f1 each LF cut fread '~/u/j/aoc/aoc2023/day_1.txt'
++/ f1 &> LF cut fread '~/u/j/aoc/aoc2023/day_1.txt'
 NB. => 54601
 
 NB. 1.2:
@@ -54,8 +54,8 @@ p2_green =: 13
 p2_blue =: 14
 
 p2_game =: [: ".@> [: {: [: cut [: > {.
-p2_ok =: [: *./ [: > [: ([: (".@{. <: [: ". 'p2_'&,@{:) [: > cut)&.> ',' cut ',' joinstring ';' cut [: > {:
-+/ */"1 >([: (p2_game,p2_ok) ':'&cut) each LF cut fread '~/u/j/aoc/aoc2023/day_2.txt'
+p2_ok =: [: *./ [: ([: (".@{. <: [: ". 'p2_'&,@{:) [: > cut)&> ',' cut ',' joinstring ';' cut [: > {:
++/ */"1 >([: (p2_game,p2_ok) ':'&cut) every LF cut fread '~/u/j/aoc/aoc2023/day_2.txt'
 NB. => 2239
 
 NB. 2.2:
