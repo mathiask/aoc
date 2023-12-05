@@ -8,9 +8,10 @@ pqr3stu8vwx
 a1b2c3d4e5f
 treb7uchet
 )
+day1 =: LF cut fread '~/u/j/aoc/aoc2023/day_1.txt'
 
 f1 =: [: +/ 10 1 * [: ".&> [: ({.,{:) (#~ e.&'0123456789')
-+/ f1 &> LF cut fread '~/u/j/aoc/aoc2023/day_1.txt'
++/ f1 &> day1
 NB. => 54601
 
 NB. 1.2:
@@ -34,7 +35,7 @@ repl1 =: 3 : 0
 )
 
 f1b =: [: +/ 10 1 * [: ".&> [: ({.,{:) [: (#~ e.&'0123456789') repl1
-+/ > f1b each LF cut fread '~/u/j/aoc/aoc2023/day_1.txt'
++/ > f1b each day1
 NB. => 54078
 
 NB. ----------------------------------------------------------------------
@@ -48,6 +49,7 @@ Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
 )
+day2 =: LF cut fread '~/u/j/aoc/aoc2023/day_2.txt'
 
 p2_red =: 12
 p2_green =: 13
@@ -55,7 +57,7 @@ p2_blue =: 14
 
 p2_game =: [: ".@> [: {: [: cut [: > {.
 p2_ok =: [: *./ [: ([: (".@{. <: [: ". 'p2_'&,@{:) [: > cut)&> ',' cut ',' joinstring ';' cut [: > {:
-+/ */"1 >([: (p2_game,p2_ok) ':'&cut) every LF cut fread '~/u/j/aoc/aoc2023/day_2.txt'
++/ */"1 >([: (p2_game,p2_ok) ':'&cut) every day2
 NB. => 2239
 
 NB. 2.2:
@@ -68,7 +70,7 @@ p2_tr =: 3 : 0
   end.
 )
 
-+/ ([: */ [: >./ [: >./ [: {{p2_tr&>y}}&> [: ','&cut&.> ';'&cut) &> {:"1':'&cut &> LF cut fread '~/u/j/aoc/aoc2023/day_2.txt'
++/ ([: */ [: >./ [: >./ [: {{p2_tr&>y}}&> [: ','&cut&.> ';'&cut) &> {:"1':'&cut &> day2
 NB. => 83435
 
 NB. ----------------------------------------------------------------------
