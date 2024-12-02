@@ -1,0 +1,24 @@
+#  -*- mode: org; coding: utf-8-unix;  -*-
+For the problems see https://adventofcode.com/2020
+
+* Learnings
+** Snippets
+#+begin_src elisp
+(goto-char 1)
+(goto-char (point-max)
+
+(search-forward "some string")
+(re-search-forward "^;;;;; INPUT$")
+(re-search-forward "^..." (line-end-position))
+(not (looking-at "^$"))
+
+(while (not (or (eobp) (looking-at "^;;;;;")))
+
+substring-no-properties
+number-sequence, dolist, dotimes, mapc, mapchar
+seq-filter, seq-map, seq-do-indexed, seq-map-indexed
+
+(split-string s ",")
+
+eq, =, string=
+#+end_src
