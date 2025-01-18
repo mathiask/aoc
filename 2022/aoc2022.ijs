@@ -415,9 +415,18 @@ NB. This also works for this syntax:
 2,3,5
 )
 
-p18 =: ".&> LF cut fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-18.txt'
-((6 * #) - +/@,@(1 = [: +/"1 |@-"1/~)) p18
+p18 =: ".&> LF cut fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-18.txt'
+s18 =: (6 * #) - +/@,@(1 = [: +/"1 |@-"1/~)
+s18 p18
 NB. => 4302
+
+NB. Explanation:
+NB. -"1/~ p18         is the table of all vector differences
+NB. +/"1|-"1/~ p18    is the L^1-norm of these differences
+NB. Then we take the one that are 1, i.e. that share a face
+NB.   - luckily this yields a 0,1 matrix - and we just sum them
+NB.   to count how many faces are touching.
+NB. Finally, we subtract this number from 6*#points.
 
 NB. 18.2
 NB. ----
@@ -429,19 +438,54 @@ NB. ----
 ]d=:(],-) (i.3) |."0 1 (3{.1)
 f =: ,/"1@;@] ;~ (,/"1@;@] , >@{.@[) (] #~ -.@e.~) >@{:@[ ([#~e.) [: ,/ d +"1/~ [:>[:{.]
 
-p18f =: > {: (p18;p18a) f^:(0 < #@>@{.@])^:_ p18x;0 3$a:
-NB. unreachable cell: (p18a ([#~-.@e.) p18f) ([#~-.@e.) p18
-((6 * #) - +/@,@(1 = [: +/"1 |@-"1/~)) (p18a ([#~-.@e.) p18f) ([#~-.@e.) p18
+NB. Originally p18f =: > {: (p18;p18a) f^:(0 < #@>@{.@])^:_ p18x;0 3$a:
+NB. ... but simpler:
+p18f =: > {: (p18;p18a) f^:_ p18x;0 3$a:
+NB. x([#~-.@e.)y is set minus x\y
+NB. unreachable cells: (p18a ([#~-.@e.) p18f) ([#~-.@e.) p18
+s18 (p18a ([#~-.@e.) p18f) ([#~-.@e.) p18
 NB. => 1810
 4302 - 1810
 NB. => 2492
+
+NB. Explanation:
+NB. p18x =: (<:@(<./) ,: >:@(>./)) p18 is the pair of minimal (x,y,z)-(1,1,1)
+NB.   and the maximal (x,y,z)+(1,1,1), i.e. the span of all points leaving
+NB.   a one space padding. ($: 2 3)
+NB. p18cp the boxed three lists of all occuring x, y and z coodinates.  It is
+NB.   a train of a rank 0 train bracketed by head and tail.
+NB. p18a are all vectors in th containing cube. Note that (,/@(,"0/))
+NB.   and (,/@(,"(0 1)/)) are cartesian products.
+NB.
+NB. d are all possible one-step move. Note that 3{.1 is just 1 0 0, and that
+NB.   ...|."0 1 (3{.1) is bracketed ...|."(0 1)...
+NB. f is the core of the solution:
+NB. - It implements BFS: (a;b) f (c;d) where
+NB.   - c are the last points (the "wave")
+NB.   - d all points seen so far
+NB.   - a are all starting coordinates, b all legal coordniates
+NB.     - i.e. b is the containing box p18a, and a and b never change
+NB. - Here is what it does reading right to left:
+NB.   - take c, tabular add it to d and flatten, to get all points you can reach
+NB.     from c in one step
+NB.   - ([#~e.) is intersection, so compute the new points within the bounding box
+NB.   - (,/"1@;@] , >@{.@[) are all reached points, i.e. wave and previous ones
+NB.   - they are "set minused" away (right to left)
+NB.   - and this is concattenated as the new 1st cell to the wave as 2nd cell
+NB.
+NB. We start it with (p18;18a) and (p18x; 0 3$a:), i.e. starting from the
+NB.   opposite extreme points and with an empty vector of visited points.
+NB. The result is boxed in the second result "cell" (the first one is empty).
+NB.
+NB. Computing the unreachable cells is explained above.
+NB. And, finally, we compute the surface of the unreachable cells
 
 NB. ----------------------------------------------------------------------
 
 NB. 20.1
 NB. ----
 
-]p20 =: ".&> cutLF fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-20.txt'
+]p20 =: ".&> cutLF fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-20.txt'
 
 NB. We have to be a bit careful because of duplicates in the input.
 NB. So we disambiguate it by applying:
