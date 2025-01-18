@@ -2,31 +2,31 @@ NB. See https://adventofcode.com/2022
 
 NB. 1.1
 NB. ---
->./ > +/ @: (". every) each (<;._2 LF chopstring fread '/Users/mathias/u/j/aoc/aoc2022/aoc-2022-1.txt')
+>./ > +/ @: (". every) each (<;._2 LF chopstring fread '/Users/mathias/u/advent_of_code/2022/aoc-2022-1.txt')
 NB. => 72602
 
 NB. ... or ...
->./ > +/ @: (". every) each (a: cut <;._2 fread '/Users/mathias/u/j/aoc/aoc2022/aoc-2022-1.txt')
+>./ > +/ @: (". every) each (a: cut <;._2 fread '/Users/mathias/u/advent_of_code/2022/aoc-2022-1.txt')
 
 
 NB. 1.2
 NB. ---
-+/ 3 {. \:~ > +/ @: (". every) each (<;._2 LF chopstring fread '/Users/mathias/u/j/aoc/aoc2022/aoc-2022-1.txt')
++/ 3 {. \:~ > +/ @: (". every) each (<;._2 LF chopstring fread '/Users/mathias/u/advent_of_code/2022/aoc-2022-1.txt')
 NB. => 207410
 
 NB. ... or ...
-+/ 3 {. \:~ > +/ @: (". every) each (a: cut <;._2 fread '/Users/mathias/u/j/aoc/aoc2022/aoc-2022-1.txt')
++/ 3 {. \:~ > +/ @: (". every) each (a: cut <;._2 fread '/Users/mathias/u/advent_of_code/2022/aoc-2022-1.txt')
 
 NB. ----------------------------------------------------------------------
 
 NB. 2.1
 NB. ---_
-+/ > ([: +/ (('ABC' i. {.) ([: >: ] + (3 3 $ 3 6 0 0 3 6 6 0 3) {~ [: < ,) ('XYZ' i. {:))) each (;&;: each LF cut fread '/Users/mathias/u/j/aoc/aoc2022/aoc-2022-2.txt')
++/ > ([: +/ (('ABC' i. {.) ([: >: ] + (3 3 $ 3 6 0 0 3 6 6 0 3) {~ [: < ,) ('XYZ' i. {:))) each (;&;: each LF cut fread '/Users/mathias/u/advent_of_code/2022/aoc-2022-2.txt')
 NB. => 13446
 
 NB. 2.2
 NB. ---_
-+/;(('ABC' i. {.) ([: >: ]+((3 3 $ 3 6 0 0 3 6 6 0 3){~[) i. ])(3 * 'XYZ' i. {:)) each ;&;:each LF cut fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-2.txt'
++/;(('ABC' i. {.) ([: >: ]+((3 3 $ 3 6 0 0 3 6 6 0 3){~[) i. ])(3 * 'XYZ' i. {:)) each ;&;:each LF cut fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-2.txt'
 NB. => 13509
 
 NB. ----------------------------------------------------------------------
@@ -39,7 +39,7 @@ sP3 =: valP3@{.@(-:&# ({. (e. # [) }.) ])
 
 NB. the @{. is needed in case an item occurs more than once in a compartment
 
-p3 =. LF cut fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-3.txt'
+p3 =. LF cut fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-3.txt'
 +/ sP3 every p3
 NB. => 7742
 
@@ -53,7 +53,7 @@ NB. ----------------------------------------------------------------------
 
 NB. 4.1
 NB. ---
-p4 =. LF cut fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-4.txt'
+p4 =. LF cut fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-4.txt'
 s4lcont =: (<: & (0&{)) *. (>: & (1&{))
 s4cont =: s4lcont +. s4lcont~
 s4 =: ((0 2)&{ s4cont (4 6)&{) @: ". @: > @ ;: @ >
@@ -78,8 +78,8 @@ NB. ---
 
 NB. The CONCISE SOLUTION is in the block of six lines near the end.
 
-NB. p5 =: <;._2 fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-5pre.txt'
-p5 =: <;._2 fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-5.txt'
+NB. p5 =: <;._2 fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-5pre.txt'
+p5 =: <;._2 fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-5.txt'
 p5s =: }: {. (p5 ];._2~ a: = p5)
 p5t =: {{ {."1 ;: |: (>: 4 * i. (>: }. $ y) % 4) {"1 y}} ,&> p5s
 
@@ -123,7 +123,7 @@ Note Inspiration from APL solution
 )
 
 NB. ==================== CONCISE SOLUTION ====================
-'p q' =. ];._1 a:,<;._2 fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-5.txt'
+'p q' =. ];._1 a:,<;._2 fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-5.txt'
 (p=.{{<@dlb"1 y#~1=4|i.#y}}|:p) ] q=.".&>(1 3 5){"1;:q
 f =: {{ (u&.> |. x{.&.>y) ,&.> x}.&.>y }}
 g =: adverb : '((0,~[:{.[) (u f) ] {~ [:}.[)`([:}.[)`]}'
@@ -152,7 +152,7 @@ NB. ----------------------------------------------------------------------
 
 NB. 7.1
 NB. ---
-]p =. cut ;._2 fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-7pre.txt'
+]p =. cut ;._2 fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-7pre.txt'
 
 docd =: {{ if. x -: ,'/' do. ,<,'/' elseif. x -: '..' do. }. y else. ((([: (,&'/')`]@.('/' = [:{:]) ]) >{.y) ,x) ; y end. }}
 f7 =: {{ if. ((,'$');'cd') -: 2{.x do. (>2{x) docd y else. y end. }}
@@ -171,14 +171,14 @@ NB. ----------------------------------------------------------------------
 NB. 8.1
 NB. ---
 froml =: (> _1 , [: }: [: >./\ ])"1
-+/+/(froml+.(froml&.(|."1))+.(froml&.|:)+.(froml&.(|."1@:|:))) "."0;._2 fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-8.txt'
++/+/(froml+.(froml&.(|."1))+.(froml&.|:)+.(froml&.(|."1@:|:))) "."0;._2 fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-8.txt'
 NB. => 1763
 
 NB. 8.2
 NB. ---
 viewr  =: [: +/ [: (] +. [: }: 1,]) [: */\ {. > }.
 viewsr =: (viewr@}.~"(1 0) [:i.#)"1
->./>./(viewsr * (viewsr&.(|."1)) * (viewsr&.|:) * (viewsr&.(|."1@:|:))) "."0;._2 fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-8.txt'
+>./>./(viewsr * (viewsr&.(|."1)) * (viewsr&.|:) * (viewsr&.(|."1@:|:))) "."0;._2 fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-8.txt'
 NB. => 671160
 
 
@@ -187,7 +187,7 @@ NB. ----------------------------------------------------------------------
 NB. 9.1
 NB. ---
 
-]p9 =. cutLF fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-9.txt'
+]p9 =. cutLF fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-9.txt'
 d9 =: (4 2 $ _1 0 1 0 0 _1 0 1) {~ 'LRUD' i. ;(".@}. $ ,@>@{.)"1 &.> p9
 s9 =: (] + [:*-)^:(1 < [: >./ [:|-)
 #~.>{:"1(0 0;0 0) ]F:.(([ + [:>@{.]) ([;s9) >@{:@]) d9
@@ -203,7 +203,7 @@ NB. ----------------------------------------------------------------------
 
 NB. 10.1
 NB. ----
-]p10 =. <;._2 fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-10.txt'
+]p10 =. <;._2 fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-10.txt'
 parse =: (2,".@>@}.@cut)`(1 0"_)@.('noop'&-:)
 +/(18 + 40 * i.6) { (2&+@i.@# * >:@(+/\)) >,&.>/ <@({.((<:@[ $ 0:),{.@$){:)"1 parse&> p10
 NB. => 12880
@@ -219,7 +219,7 @@ NB. ----
 
 NB. APL inspired solution, see below:
 
-p11 =: > a: cut <;._2 fread '/Users/mathias/u/j/aoc/aoc2022/aoc-2022-11.txt'
+p11 =: > a: cut <;._2 fread '/Users/mathias/u/advent_of_code/2022/aoc-2022-11.txt'
 atoi =: (a.{~48+i.10) ".@(e.~#]) ]
 parse =: ([: atoi 0 pick ]); ([: ". ':' takeafter 1 pick ]); ('=' takeafter 2 pick ]); ([: atoi 3 pick ]); ([: atoi 4 pick ]); [: atoi 5 pick ]
 ]pp11 =: parse"1 p25
@@ -284,7 +284,7 @@ Note Jay Foad's APL solution (https://github.com/jayfoad/aoc2022apl/blob/main/p1
 NB. ========== Concise(r) solution ==========
 
 NB. So, let us do this in J....
-n11 =: '0123456789,'&(".@(e.~#]))&.> n011 =: > a: cut <;._2 fread '/Users/mathias/u/j/aoc/aoc2022/aoc-2022-11.txt'
+n11 =: '0123456789,'&(".@(e.~#]))&.> n011 =: > a: cut <;._2 fread '/Users/mathias/u/advent_of_code/2022/aoc-2022-11.txt'
 f11 =: dyad define
   k =. >./1, 2 pick x
   e =. 2 pick y
@@ -361,7 +361,7 @@ h =: dyad define
 NB. Or h as a one-liner:
 s12 =: {{ (((>:x) s12 ns <: [: >: [: g ns*])`(x"_) @. ((<e){y)) y }}
 
-p12 =: >cutLF fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-12.txt'
+p12 =: >cutLF fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-12.txt'
 ]ns =:1 + 1 >. 26 <. ('S',a.{~97+i.26) i. p12
 ]e =: ;I.&.>(+./"1; +./) 'E'= p12
 0 s12 'S'=p12
@@ -464,7 +464,7 @@ NB. ----------------------------------------------------------------------
 NB. 25.1
 NB. ----
 
-]p25 =: cutLF fread'/Users/mathias/u/j/aoc/aoc2022/aoc-2022-25.txt'
+]p25 =: cutLF fread'/Users/mathias/u/advent_of_code/2022/aoc-2022-25.txt'
 s25 =: 5 #. [: ". &> [: ('-';'_1';'=';'_2')&stringreplace&.> <"0
 5 #.inv +/ s25 &> p25
 NB. => 1 3 3 1 2 2 4 4 3 4 2 3 1 3 0 2 1 3 1 0
